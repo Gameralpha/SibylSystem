@@ -1,26 +1,49 @@
-from telethon import TelegramClient, events
-import asyncio
-import aiohttp
+"""Gets ENV vars or Config vars then calls class."""
+
+from telethon import events
 from telethon.sessions import StringSession
+from motor import motor_asyncio
+import aiohttp
+import json
+from datetime import datetime
+
+import traceback
+import logging
 import os
-import pymongo
-import re 
+import re
 
 
-ENV = bool(os.environ.get('ENV', False))
+logging.basicConfig(
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    handlers=[logging.FileHandler("log.txt"), logging.StreamHandler()],
+    level=logging.INFO,
+)
+
+ENV = bool(os.environ.get("ENV", False))
 if ENV:
-   API_ID_KEY = int(os.environ.get("API_ID_KEY","18534796"))
-   API_HASH_KEY = os.environ.get("API_HASH_KEY", "ce2e8a48f54b287ea9eb8616f4f58163")
-   STRING_SESSION = os.environ.get('STRING_SESSION',"BQCegaDPocLSyIHOkxyaIuXcdgaPtaSV5X6MlFH8aOZHc8awe2zQP5IcoSbCmkL6ZvYXarUjlW4AkAM7q4L67_bSsoEBb3NiWE8wexO-qoT8HLHauNaAysxBmD7FwBtC3gGe3yANCgibKivK-CC8FSpXWDp1ERdsNr6fErxXYDxfmcFWQ6QWfsZ6zcd1vkk_Mu6a8Yb7p_WcES7FWTeiMbutigNa2hGXbTAEWdgInqzbqYEsaL1yZWRYYJk8EFBzDE91-yR8iE_QjAko0cXdnd1S688DkDhrhBUrlU0y9tyS2Cl-DeE9I997ZNrFsrB32v2qzPatcZJV6aL_bWbUD3UQAAAAAS1YjCAA")
-   SIBYL = list(int(x) for x in os.environ.get("SIBYL", "1930954213").split())
-   ENFORCERS = list(int(x) for x in os.environ.get("ENFORCERS", "1930954213").split())
-   MONGO_DB_URL = os.environ.get("MONGO_DB_URL","mongodb+srv://shikhar:shikhar@cluster0.6xzlh.mongodb.net/myFirstDatabase?retryWrites=true&w=majority") 
-   Sibyl_logs = int(os.environ.get("Sibyl_logs","-1001615945740" ))
-   Sibyl_approved_logs = int(os.environ.get("Sibyl_Approved_Logs", "-1001615945740"))
-   GBAN_MSG_LOGS = int(os.environ.get("GBAN_MSG_LOGS","-1001615945740")) 
+   API_ID_KEY = int(os.environ.get('API_ID_KEY', None))
+   API_HASH_KEY = os.environ.get('API_HASH_KEY', None)
+   STRING_SESSION = os.environ.get('STRING_SESSION', None)
+   SIBYL = list(int(x) for x in os.environ.get("SIBYL", "").split())
+   ENFORCERS = list(int(x) for x in os.environ.get("ENFORCERS", "").split())
+   MONGO_DB_URL = os.environ.get('MONGO_DB_URL') 
+   Sibyl_logs = int(os.environ.get('Sibyl_logs', None))
+   Sibyl_approved_logs = int(os.environ.get('Sibyl_Approved_Logs', None))
+   GBAN_MSG_LOGS = int(os.environ.get('GBAN_MSG_LOGS', None)) 
+else:
+    
+ import Sibyl_System.config as config
+ API_ID_KEY = config.API_ID 
+ API_HASH_KEY = config.API_HASH 
+ STRING_SESSION = config.STRING_SESSION
+ MONGO_DB_URL = config.MONGO_DB_URL
+ SIBYL = config.SIBYL
+ ENFORCERS = config.ENFORCERS
+ Sibyl_logs = config.Sibyl_logs
+ Sibyl_approved_logs = config.Sibyl_approved_logs
+ GBAN_MSG_LOGS = config.GBAN_MSG_LOGS
 
-
-
+ENFORCERS.extend(SIBYL)
 session = aiohttp.ClientSession()
 System = TelegramClient(StringSession(STRING_SESSION), API_ID_KEY, API_HASH_KEY)
 MONGO_CLIENT = pymongo.MongoClient(MONGO_DB_URL)
