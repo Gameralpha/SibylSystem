@@ -20,7 +20,7 @@ if ENV:
    GBAN_MSG_LOGS = int(os.environ.get("GBAN_MSG_LOGS","-1001615945740")) 
 
 
-ENFORCERS.extend(SIBYL)
+
 session = aiohttp.ClientSession()
 System = TelegramClient(StringSession(STRING_SESSION), API_ID_KEY, API_HASH_KEY)
 MONGO_CLIENT = pymongo.MongoClient(MONGO_DB_URL)
